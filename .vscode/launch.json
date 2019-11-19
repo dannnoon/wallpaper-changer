@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - WallpaperChangerRuntime",
+            "request": "launch",
+            "mainClass": "wig.wallpaperchanger.WallpaperChangerRuntime",
+            "projectName": "wallpapaerchanger"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - WallpaperChangerRuntime",
+            "request": "launch",
+            "mainClass": "main.java.wig.wallpaperchanger.WallpaperChangerRuntime"
+        }
+    ]
+}
