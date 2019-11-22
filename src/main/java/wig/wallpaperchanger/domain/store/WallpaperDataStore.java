@@ -1,10 +1,8 @@
 package wig.wallpaperchanger.domain.store;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -17,7 +15,7 @@ import java.lang.reflect.Type;
 import com.google.gson.reflect.TypeToken;
 import wig.wallpaperchanger.domain.data.Wallpaper;
 
-class WallpaperDataStore {
+public class WallpaperDataStore {
     private final String FILE_NAME = "database.json";
 
     private final Gson gson;
@@ -40,14 +38,8 @@ class WallpaperDataStore {
     }
 
     public Single<List<Wallpaper>> load() {
-        return Single.fromCallable(() -> {
-            try {
-                return readFileContent();
-            }  catch(Exception exception) {
-                exception.printStackTrace();
-                return List.of();
-            }
-        });
+        return Single.fromCallable(this::readFileContent)
+            .onErrorResumeNext(error -> Single.just(List.of()));
     } 
 
     public Single<Boolean> isEmpty() {

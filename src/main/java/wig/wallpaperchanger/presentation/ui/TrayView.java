@@ -4,6 +4,9 @@ import wig.wallpaperchanger.presentation.util.ImageHelper;
 
 import java.awt.*;
 
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+
 public class TrayView implements TrayViewInterface {
     private TrayViewPresenter presenter;
     private SystemTray systemTray;
@@ -46,6 +49,7 @@ public class TrayView implements TrayViewInterface {
 
         exitMenuItem = new MenuItem("Wyjście");
         exitMenuItem.addActionListener(action -> {
+            presenter.dispose();
             systemTray.remove(trayIcon);
             System.exit(0);
         });
@@ -61,7 +65,7 @@ public class TrayView implements TrayViewInterface {
         nameMenuItem = new MenuItem(name);
         nameMenuItem.setEnabled(false);
 
-        popupMenu.insert(nameMenuItem, 0);
+        SwingUtilities.invokeLater(() -> popupMenu.insert(nameMenuItem, 0));
     }
 
     @Override

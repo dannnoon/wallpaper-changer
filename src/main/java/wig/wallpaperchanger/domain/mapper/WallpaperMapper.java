@@ -10,7 +10,8 @@ public class WallpaperMapper {
             item.getPublishDate(),
             item.getImage().getUri(),
             item.getImage().getTitle(),
-            item.getImage().getCaption()
+            item.getImage().getCaption(),
+            false
         );
     }
 }

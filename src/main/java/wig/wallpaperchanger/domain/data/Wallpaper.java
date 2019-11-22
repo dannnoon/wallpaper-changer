@@ -1,6 +1,5 @@
 package wig.wallpaperchanger.domain.data;
 
-import io.reactivex.annotations.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,5 +13,21 @@ public class Wallpaper {
     public final String uri;
     public final String title;
     public final String description;
-    @Nullable public final boolean unliked;
+    public final boolean unliked;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Wallpaper) {
+            if (((Wallpaper)obj).id == this.id) {
+                return true;
+            }
+            return false;
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode() * 31 + title.hashCode();
+    }
 }
