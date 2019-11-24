@@ -22,6 +22,8 @@ public class WallpaperImageStore {
                 return Completable.complete();
             }
 
+            Files.createDirectories(image.getParent());
+
             try(InputStream in = new URL(wallpaper.uri).openStream()) {
                 Files.copy(in, image, StandardCopyOption.REPLACE_EXISTING);
             }
