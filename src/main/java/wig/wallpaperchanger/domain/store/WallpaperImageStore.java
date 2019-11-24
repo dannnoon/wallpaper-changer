@@ -2,7 +2,6 @@ package wig.wallpaperchanger.domain.store;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,10 +16,14 @@ public class WallpaperImageStore {
 
     public Completable save(Wallpaper wallpaper) {
         return Completable.fromCallable(() -> {
+            final Path image = getImagePath(wallpaper);
+
+            if (image.toFile().exists()) {
+                return Completable.complete();
+            }
+
             try(InputStream in = new URL(wallpaper.uri).openStream()) {
-                final Path path = getImagePath(wallpaper);
-                System.console().printf(path.toAbsolutePath().toString());
-                Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(in, image, StandardCopyOption.REPLACE_EXISTING);
             }
 
             return Completable.complete();
@@ -29,6 +32,10 @@ public class WallpaperImageStore {
 
     public String imagePath(Wallpaper wallpaper) {
         return getImagePath(wallpaper).toString();
+    }
+
+    public String absoluteImagePath(Wallpaper wallpaper) {
+        return getImagePath(wallpaper).toAbsolutePath().toString();
     }
 
     private Path getImagePath(Wallpaper wallpaper) {

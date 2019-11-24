@@ -1,20 +1,24 @@
 package wig.wallpaperchanger.presentation.ui;
 
+import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import wig.wallpaperchanger.domain.data.Wallpaper;
-import wig.wallpaperchanger.domain.repository.WallpaperRepository;
+import wig.wallpaperchanger.domain.usecase.ChangeWallpaper;
+import wig.wallpaperchanger.domain.usecase.LoadNewestWallpapers;
 
 class TrayViewPresenter {
     final private TrayView trayView;
-    final private WallpaperRepository repository;
+    final private LoadNewestWallpapers loadNewestWallpapers;
+    final private ChangeWallpaper changeWallpaper;
 
     private Disposable disposable;
     private Wallpaper currentWallpaper;
 
     TrayViewPresenter(TrayView trayView) {
         this.trayView = trayView;
-        this.repository = new WallpaperRepository();
+        this.loadNewestWallpapers = new LoadNewestWallpapers();
+        this.changeWallpaper = new ChangeWallpaper();
 
         initialize();
     }
@@ -34,7 +38,8 @@ class TrayViewPresenter {
     }
 
     private void initialize() {
-        disposable = repository.getNewestWallpaper()
+        disposable = loadNewestWallpapers.invoke()
+            .flatMap(wallpaper -> changeWallpaper.invoke(wallpaper).andThen(Single.just(wallpaper)))
             .subscribeOn(Schedulers.io())
             .subscribe(
                 (wallpaper) -> {

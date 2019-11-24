@@ -1,19 +1,14 @@
 package wig.wallpaperchanger.domain.repository;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
-import java.util.Set;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import wig.wallpaperchanger.domain.data.Wallpaper;
 import wig.wallpaperchanger.domain.store.WallpaperDataStore;
 import wig.wallpaperchanger.domain.store.WallpaperImageStore;
+import wig.wallpaperchanger.domain.util.WallpaperDateSort;
 import wig.wallpaperchanger.network.source.WallpaperDataSource;
 
 public class WallpaperRepository {
@@ -29,21 +24,14 @@ public class WallpaperRepository {
 
     public Single<Wallpaper> getNewestWallpaper() {
         return Single.zip(dataSource.queryWallpapers(), dataStore.load(), (freshData, storedData) -> {
-            final Set<Wallpaper> wallpapersSet = new HashSet<>(freshData);
-            wallpapersSet.addAll(storedData);
-
-            final SimpleDateFormat formatter = new SimpleDateFormat("MMMMM d, yyyy", Locale.ENGLISH);
-            final List<Wallpaper> sortedWallpapers = new ArrayList<>(wallpapersSet);
-            sortedWallpapers.sort((a, b) -> {
-                try {
-                    final Date dateA = formatter.parse(a.publishDate);
-                    final Date dateB = formatter.parse(b.publishDate);
-                    return dateB.compareTo(dateA);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                    return 0;
+            final List<Wallpaper> sortedWallpapers = new ArrayList<>(storedData);
+            freshData.forEach(newWallpaper -> {
+                if (!sortedWallpapers.contains(newWallpaper)) {
+                    sortedWallpapers.add(newWallpaper);
                 }
             });
+
+            sortedWallpapers.sort(WallpaperDateSort::sort);
 
             return sortedWallpapers;
         })

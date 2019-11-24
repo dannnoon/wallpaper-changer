@@ -5,7 +5,6 @@ import wig.wallpaperchanger.presentation.util.ImageHelper;
 import java.awt.*;
 
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 
 public class TrayView implements TrayViewInterface {
     private TrayViewPresenter presenter;
@@ -62,10 +61,12 @@ public class TrayView implements TrayViewInterface {
 
     @Override
     public void showCurrentWallpaperName(String name) {
-        nameMenuItem = new MenuItem(name);
-        nameMenuItem.setEnabled(false);
+        SwingUtilities.invokeLater(() -> {
+            nameMenuItem = new MenuItem(name);
+            nameMenuItem.setEnabled(false);
 
-        SwingUtilities.invokeLater(() -> popupMenu.insert(nameMenuItem, 0));
+            popupMenu.insert(nameMenuItem, 0);
+        });
     }
 
     @Override
