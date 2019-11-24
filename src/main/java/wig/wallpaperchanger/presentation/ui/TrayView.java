@@ -62,8 +62,12 @@ public class TrayView implements TrayViewInterface {
     @Override
     public void showCurrentWallpaperName(String name) {
         SwingUtilities.invokeLater(() -> {
-            nameMenuItem = new MenuItem(name);
-            nameMenuItem.setEnabled(false);
+            if (nameMenuItem == null) {
+                nameMenuItem = new MenuItem(name);
+                nameMenuItem.setEnabled(false);
+            } else {
+                nameMenuItem.setLabel(name);
+            }
 
             popupMenu.insert(nameMenuItem, 0);
         });
@@ -71,11 +75,11 @@ public class TrayView implements TrayViewInterface {
 
     @Override
     public void showRollDiceOption() {
-        
+        rollDiceMenuItem.setEnabled(true);
     }
 
     @Override
     public void hideRollDiceOption() {
-        
+        rollDiceMenuItem.setEnabled(false);
     }
 }
