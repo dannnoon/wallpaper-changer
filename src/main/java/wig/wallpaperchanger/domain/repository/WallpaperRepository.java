@@ -35,13 +35,25 @@ public class WallpaperRepository {
 
             return sortedWallpapers;
         })
-        .flatMap(wallpapers -> dataStore.save(wallpapers).andThen(Single.just(wallpapers)))
-        .flatMap(wallpapers -> Observable.fromIterable(wallpapers).concatMapCompletable(wallpaper -> imageStore.save(wallpaper)).andThen(Single.just(wallpapers)))
-        .map(wallpapers -> {
-            return wallpapers.stream()
+        .flatMap(this::storeWallpapersData)
+        .flatMap(this::storeWallpapersImage)
+        .map(this::findNewestWallpaper);
+    }
+
+    private Single<List<Wallpaper>> storeWallpapersData(List<Wallpaper> wallpapers) {
+        return dataStore.save(wallpapers).andThen(Single.just(wallpapers));
+    }
+
+    private Single<List<Wallpaper>> storeWallpapersImage(List<Wallpaper> wallpapers) {
+        return Observable.fromIterable(wallpapers)
+            .concatMapCompletable(wallpaper -> imageStore.save(wallpaper))
+            .andThen(Single.just(wallpapers));
+    }
+
+    private Wallpaper findNewestWallpaper(List<Wallpaper> wallpapers) {
+        return wallpapers.stream()
                 .filter(item -> !item.isUnliked())
                 .findFirst()
                 .get();
-        });
     }
 }
