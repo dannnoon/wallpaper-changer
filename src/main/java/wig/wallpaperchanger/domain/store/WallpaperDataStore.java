@@ -5,7 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.google.gson.Gson;
 
@@ -35,6 +37,19 @@ public class WallpaperDataStore {
 
             return Completable.complete();
         });
+    }
+
+    public Completable update(Wallpaper wallpaper) {
+        return load().flatMapCompletable(wallpapers -> Completable.fromCallable(() -> {
+            final Set<Wallpaper> wallpaperSet = new HashSet<Wallpaper>(wallpapers);
+
+            if (wallpapers.contains(wallpaper)) {
+                wallpaperSet.remove(wallpaper);
+            }
+
+            wallpaperSet.add(wallpaper);
+            return save(List.copyOf(wallpaperSet)).blockingGet();
+        }));
     }
 
     public Single<List<Wallpaper>> load() {

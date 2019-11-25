@@ -82,4 +82,14 @@ public class TrayView implements TrayViewInterface {
     public void hideRollDiceOption() {
         rollDiceMenuItem.setEnabled(false);
     }
+
+    @Override
+    public void showUnlikeOption() {
+        unlikeMenuItem.setEnabled(true);
+    }
+
+    @Override
+    public void hideUnlikeOption() {
+        unlikeMenuItem.setEnabled(false);
+    }
 }

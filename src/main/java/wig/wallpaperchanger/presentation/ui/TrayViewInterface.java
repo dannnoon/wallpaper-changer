@@ -7,4 +7,8 @@ interface TrayViewInterface {
     void showRollDiceOption();
 
     void hideRollDiceOption();
+
+    void showUnlikeOption();
+
+    void hideUnlikeOption();
 }

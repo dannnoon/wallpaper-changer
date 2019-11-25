@@ -28,7 +28,7 @@ public class ChangeWallpaperRandomly {
 
     private Single<Wallpaper> getRandomWallpaper(List<Wallpaper> wallpapers, Wallpaper current) {
         final List<Wallpaper> whiteList = wallpapers.stream()
-            .filter(wallpaper -> !wallpaper.unliked && wallpaper != current)
+            .filter(wallpaper -> !wallpaper.unliked && !wallpaper.equals(current))
             .collect(Collectors.toList());
         final Wallpaper randomWallpaper = whiteList.get(random.nextInt(whiteList.size()));
         return Single.just(randomWallpaper);

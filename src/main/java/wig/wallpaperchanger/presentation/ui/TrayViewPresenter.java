@@ -7,15 +7,19 @@ import wig.wallpaperchanger.domain.data.Wallpaper;
 import wig.wallpaperchanger.domain.usecase.ChangeWallpaper;
 import wig.wallpaperchanger.domain.usecase.ChangeWallpaperRandomly;
 import wig.wallpaperchanger.domain.usecase.LoadNewestWallpapers;
+import wig.wallpaperchanger.domain.usecase.UnlikeCurrentWallpaper;
 
 class TrayViewPresenter {
     final private TrayView trayView;
     final private LoadNewestWallpapers loadNewestWallpapers;
     final private ChangeWallpaper changeWallpaper;
     final private ChangeWallpaperRandomly changeWallpaperRandomly;
+    final private UnlikeCurrentWallpaper unlikeCurrentWallpaper;
 
     private Disposable initializeDisposable;
     private Disposable changeWallpaperRandomlyDisposable;
+    private Disposable unlikeCurrentWallpaperDisposable;
+
     private Wallpaper currentWallpaper;
 
     TrayViewPresenter(TrayView trayView) {
@@ -23,12 +27,30 @@ class TrayViewPresenter {
         this.loadNewestWallpapers = new LoadNewestWallpapers();
         this.changeWallpaper = new ChangeWallpaper();
         this.changeWallpaperRandomly = new ChangeWallpaperRandomly();
+        this.unlikeCurrentWallpaper = new UnlikeCurrentWallpaper();
 
         initialize();
     }
 
     void markCurrentAsUnliked() {
-        
+        if (unlikeCurrentWallpaperDisposable != null) {
+            unlikeCurrentWallpaperDisposable.dispose();
+        }
+
+        trayView.hideUnlikeOption();
+
+        unlikeCurrentWallpaperDisposable = unlikeCurrentWallpaper.invoke(currentWallpaper)
+            .subscribeOn(Schedulers.io())
+            .doOnTerminate(() -> trayView.showUnlikeOption())
+            .subscribe(
+                (wallpaper) -> {
+                    currentWallpaper = wallpaper;
+                    trayView.showCurrentWallpaperName(wallpaper.title);
+                },
+                (error) -> {
+                    error.printStackTrace();
+                }
+            );
     }
 
     void changeToRandomWallpaper() {
@@ -56,6 +78,12 @@ class TrayViewPresenter {
         if (initializeDisposable != null) {
             initializeDisposable.dispose();;
         }
+        if (changeWallpaperRandomlyDisposable != null) {
+            changeWallpaperRandomlyDisposable.dispose();
+        }
+        if (unlikeCurrentWallpaperDisposable != null) {
+            unlikeCurrentWallpaperDisposable.dispose();
+        }
     }
 
     private void initialize() {
@@ -71,6 +99,7 @@ class TrayViewPresenter {
                     currentWallpaper = wallpaper;
                     trayView.showCurrentWallpaperName(wallpaper.title);
                     trayView.showRollDiceOption();
+                    trayView.showUnlikeOption();
                 },
                 (error) -> {
                     error.printStackTrace();
